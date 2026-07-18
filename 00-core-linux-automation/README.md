@@ -33,3 +33,21 @@ logs/ping_results.log
 
 This allows the repository to be cloned and executed immediately on any standard Linux distribution without breaking due to hardcoded home directory dependencies.
 
+---
+
+## ⚙️ Deployment & Execution Baselines
+
+To run these diagnostics utilities on any standard enterprise Linux node, execute the following permission updates and commands:
+
+```bash
+# 1. Clone the repository down to the local host
+git clone [https://github.com/kyleromney39-web/az104-lab-portfolio.git](https://github.com/kyleromney39-web/az104-lab-portfolio.git)
+
+# 2. Change directory into the automation core
+cd az104-lab-portfolio/00-core-linux-automation
+
+# 3. Elevate execution privileges on the script assets
+chmod +x bootstrap.sh syscheck.sh netping.sh
+
+# 4. Execute the system monitor utility
+./syscheck.sh
