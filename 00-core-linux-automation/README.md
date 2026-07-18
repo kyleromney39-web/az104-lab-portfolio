@@ -1,6 +1,6 @@
 # 🎯 Module 00: Core Linux Automation & Systems Diagnostics
 
-Core Linux Automation
+## Core Linux Automation
 This directory contains a set of lightweight, native Bash scripts designed to handle system health checks and network diagnostics without relying on heavy, third-party monitoring tools.
 
 🛠️ Included Utilities
