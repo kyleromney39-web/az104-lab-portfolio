@@ -1,46 +1,35 @@
 # 🎯 Module 00: Core Linux Automation & Systems Diagnostics
 
-## 📋 Overview
-This module serves as the automation foundation for my engineering portfolio. It features a suite of foundational Bash scripts designed to handle remote asset downloads, core resource threshold auditing, and baseline network connectivity verification. These utilities leverage native Linux binaries, exit codes, and text-processing tools to deliver lightweight system diagnostics.
+Core Linux Automation
+This directory contains a set of lightweight, native Bash scripts designed to handle system health checks and network diagnostics without relying on heavy, third-party monitoring tools.
 
-### 🛠️ The Automation Toolkit
-1. **`bootstrap.sh`**: Simulates a cloud server's startup routine by verifying outbound connectivity and downloading a remote web asset (`index.html`) using `curl`, followed by an asset validation check.
-2. **`syscheck.sh`**: Evaluates system storage and memory health. It parses the root filesystem capacity via `df` and processes physical memory consumption using custom shell arithmetic, writing warning alerts to a persistent log file.
-3. **`netping.sh`**: Verifies public internet reachability by executing targeted ICMP echo requests to Google Public DNS (`8.8.8.8`), tracking execution exit codes to determine path status.
+🛠️ Included Utilities
+bootstrap.sh – Simulates a cloud startup routine, using curl to download and validate remote web assets.
 
----
+syscheck.sh – Monitors storage and memory thresholds utilizing native shell arithmetic.
 
-## 🪵 Production Engineering Log: Challenges & Core Solves
+netping.sh – A quick network diagnostics utility that evaluates outbound public internet reachability.
 
-Building these utilities exposed several fundamental quirks within the Linux operating system and shell environments. Below is the technical documentation of the engineering hurdles encountered and the architectural choices made to overcome them.
+💡 Engineering Challenges & Solutions
+Building these utilities was a great reminder that even simple automation throws fun, real-world hurdles at you. Here is how specific system constraints were addressed in the codebase:
 
-### 🧠 Challenge 1: Native Bash Floating-Point Math Constraints
-* **The Problem**: Bash is inherently incapable of handling decimal or floating-point math natively; it truncates division into integers. When calculating live memory consumption percentages (`MEM_USED / MEM_TOTAL`), standard division would result in `0` for any usage under 100%, breaking the logic.
-* **The Solve**: Implemented an integer scaling strategy within the mathematical evaluation block: `(( MEM_USED * 100 / MEM_TOTAL ))`. Shifting the decimal place by multiplying the numerator by 100 *before* dividing ensures accurate whole-number percentages directly within native shell arithmetic.
+1. Handling Bash Math Constraints
+Bash doesn't do floating-point decimal division out of the box, which normally breaks things when attempting to calculate memory utilization percentages. To get accurate whole numbers, the scripts multiply the numerator by 100 before running the division. This ensures the system outputs accurate whole-number metrics instead of truncating the decimal straight to zero.
 
-### 🔍 Challenge 2: Stream Filtering and Column Parsing with `awk`
-* **The Problem**: Raw system outputs like `df -h` and `free -m` produce complex, multi-row data blocks filled with variable whitespace. Running `awk` across unstructured data risks targeting the wrong columns if system specs drift or change headers.
-* **The Solve**: Chained explicit `grep` filters into the command pipeline (`grep -w '/'` for disk data and `grep "Mem"` for memory data). This strips out system noise, flattens the matrix to a single predictable row, and allows `awk` to reliably isolate and extract precise positional columns (like the 5th column for disk utilization and the 2nd/3rd for memory metrics).
+2. Parsing Shifting Log Headers
+Raw outputs from commands like df -h and free -m can be tough to parse reliably because headers and columns move depending on the system environment. To isolate the data cleanly, grep filters are used to flatten the output into a single predictable row first, making it easy for awk to accurately grab the exact positional columns needed.
 
-### 🔊 Challenge 3: Suppressing Stream Noise and Tracking Sub-Process Outcomes
-* **The Problem**: Raw command outputs (like `ping` metrics) print text blocks that clutter the terminal during background operations. Additionally, scripts need a way to programmatically determine if an external operation succeeded or failed without looking at the text display.
-* **The Solve**: Utilized file-descriptor redirection (`> /dev/null 2>&1`) to completely silence the standard output and error streams of the `ping` command. To handle automation logic, the script evaluates the conditional shell variable `$?` immediately after execution. Capturing this exit code (`0` for success, non-zero for failure) allows the script to branch into clean, user-friendly logs via `tee -a`.
+3. Managing Stream Noise & Log Multiplexing
+To keep network timeout errors from cluttering the terminal output, standard error and standard output redirection (2>&1) are used to quiet raw errors. The clean output is then piped through tee -a to split the data stream to writing persistent alerts to a local log folder while still displaying real-time output on the screen.
 
----
+📂 Portability & Logs
+All scripts are optimized using relative paths to ensure complete portability across different environments.
 
-## ⚙️ Deployment & Execution Baselines
+The resource and network scripts will automatically verify, create, and append data to a local directory structure:
 
-To run these diagnostics utilities on any standard enterprise Linux node, execute the following permission updates and commands:
+logs/system_alerts.log
 
-```bash
-# 1. Clone the repository down to the local host
-git clone [https://github.com/kyleromney39-web/az104-lab-portfolio.git](https://github.com/kyleromney39-web/az104-lab-portfolio.git)
+logs/ping_results.log
 
-# 2. Change directory into the automation core
-cd az104-lab-portfolio/00-core-linux-automation
+This allows the repository to be cloned and executed immediately on any standard Linux distribution without breaking due to hardcoded home directory dependencies.
 
-# 3. Elevate execution privileges on the script assets
-chmod +x bootstrap.sh syscheck.sh netping.sh
-
-# 4. Execute the system monitor utility
-./syscheck.sh
