@@ -41,16 +41,17 @@ To run these diagnostics utilities on any standard enterprise Linux node, execut
 
 ```bash
 # 1. Clone the repository down to the local host
-git clone [https://github.com/kyleromney39-web/az104-lab-portfolio.git](https://github.com/kyleromney39-web/az104-lab-portfolio.git)
+git clone https://github.com/kyleromney39-web/az104-lab-portfolio.git
 
 # 2. Change directory into the automation core
 cd az104-lab-portfolio/00-core-linux-automation
 
 # 3. Elevate execution privileges on the script assets
-chmod +x bootstrap.sh syscheck.sh netping.sh
+chmod +x bootstrap.sh syscheck.sh netping.sh audit_log.sh
 
 # 4. Execute the system monitor utility
 ./syscheck.sh
+```
 
 ---
 
