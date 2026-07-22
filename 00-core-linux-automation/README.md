@@ -51,3 +51,37 @@ chmod +x bootstrap.sh syscheck.sh netping.sh
 
 # 4. Execute the system monitor utility
 ./syscheck.sh
+
+---
+
+## 📜 `audit_log.sh`
+
+This is a Bash script I made that searches through system log files to find error messages and count how many times they happened.
+
+### What it does:
+* **Checks the file first:** Makes sure the log file actually exists and that you have permission to read it before trying to run the main commands.
+* **Flexible file input:** You can pass in any log file you want to check. If you don't pass one in, it automatically defaults to `/var/log/syslog`.
+* **Simple pipeline:** Uses `cut`, `grep`, `sort`, and `uniq` to pull out error lines and show a clean list of how many times each error popped up.
+
+---
+
+## 💡 What I Learned & Challenges
+
+### 1. Why I chose `cut` instead of `awk`
+* **The Problem:** When I tried using `awk`, the column numbers kept changing and doesn't line up due to different naming. e.g "service Failed" compared to "service-log-failed" "Failed" is in column 2 while "failed" is in column 1. 
+* **The Solution:** I switched to `cut -d ':' -f 5-`. Splitting on the colon made it much easier to chop off the timestamp at the beginning without messing up the actual message text.
+
+### 2. Stopping the script early if something is wrong
+* **The Problem:** If I ran the script on a file that didn't exist or one that needed `sudo` access, Bash printed out messy errors and tried running the rest of the commands anyway.
+* **The Solution:** I added `if` statements using `-f` (to check if the file exists) and `-r` (to check if it's readable). If a check fails, it prints a clear error message and stops the script right away using `exit 1`.
+
+---
+
+## 🤖 How I Used AI
+
+I used AI to help build the basic starter structure for the script (like the layout for the parameter defaults and `if` checks). 
+
+Getting help with the basic script outline saved time so I could focus on:
+* Building and testing the `cut | grep | sort` pipeline commands.
+* Learning how file permissions and exit codes work in Linux.
+* Practicing my Git workflow using branches, commits, and pull requests.
