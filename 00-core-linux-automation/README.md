@@ -69,8 +69,8 @@ This is a Bash script I made that searches through system log files to find erro
 ## 💡 What I Learned & Challenges
 
 ### 1. Why I chose `cut` instead of `awk`
-* **The Problem:** When I tried using `awk`, the column numbers kept changing and doesn't line up due to different naming. e.g "service Failed" compared to "service-log-failed" "Failed" is in column 2 while "failed" is in column 1. 
-* **The Solution:** I switched to `cut -d ':' -f 5-`. Splitting on the colon made it much easier to chop off the timestamp at the beginning without messing up the actual message text.
+* **The Problem:** With timestamps like 2026-07-01:19:00:34, awk splits text by spaces by default. That caused a big problem with log lines. A line like begin service running splits into 3 words, but load-service running only splits into 2 words because of the hyphen! That made my word counts completely wrong. 
+* **The Solution:** I switched to cut -d ':' -f 5-, which splits on the colon, chops off the timestamp at the front, and leaves the rest of the message alone.
 
 ### 2. Stopping the script early if something is wrong
 * **The Problem:** If I ran the script on a file that didn't exist or one that needed `sudo` access, Bash printed out messy errors and tried running the rest of the commands anyway.
